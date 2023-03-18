@@ -1,0 +1,227 @@
+{
+  "name": "Taunting Blade",
+  "type": "spell",
+  "img": "icons/weapons/swords/sword-runed-glowing.webp",
+  "system": {
+    "description": {
+      "value": "<div class=\"rd__b  rd__b--3\"><p>You brandish the weapon used in the spell's casting and make a melee attack with it against one creature within 5 feet of you. On a hit, the target suffers the weapon attack's normal effects and then becomes surrounded by mocking laughter until the start of your next turn. If the target fails an ability check or attack roll before then, the target takes [[/r 1d6]] psychic damage, and the spell ends.</p><div class=\"rd__spc-inline-post\"><p></p></div><p>This spell's damage increases when you reach certain levels. At 5th level, the melee attack deals an extra [[/r 1d6]] psychic damage to the target on a hit, and the damage the target takes for moving increases to [[/r 2d6]]. Both damage rolls increase by 1d6 at 11th level ([[/r 2d6]] and [[/r 3d6]]) and again at 17th level ([[/r 3d6]] and [[/r 4d6]]).</p></div>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": "",
+    "activation": {
+      "type": "action",
+      "cost": 1,
+      "condition": ""
+    },
+    "duration": {
+      "value": "",
+      "units": "inst"
+    },
+    "target": {
+      "value": 1,
+      "width": null,
+      "units": "",
+      "type": "creature"
+    },
+    "range": {
+      "value": 5,
+      "long": null,
+      "units": "ft"
+    },
+    "uses": {
+      "value": null,
+      "max": "",
+      "per": "",
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": "",
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "other",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell"
+    },
+    "level": 0,
+    "school": "evo",
+    "components": {
+      "vocal": false,
+      "somatic": true,
+      "material": true,
+      "ritual": false,
+      "concentration": false
+    },
+    "materials": {
+      "value": "",
+      "consumed": false,
+      "cost": 0,
+      "supply": 0
+    },
+    "preparation": {
+      "mode": "always",
+      "prepared": false
+    },
+    "scaling": {
+      "mode": "none",
+      "formula": ""
+    }
+  },
+  "effects": [
+    {
+      "_id": "9MUNrfcmZSsacNw6",
+      "changes": [
+        {
+          "key": "macro.itemMacro",
+          "mode": 0,
+          "value": "",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "turns": 1,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "icon": "icons/weapons/swords/sword-runed-glowing.webp",
+      "label": "Taunting Blade",
+      "transfer": false,
+      "flags": {
+        "core": {
+          "statusId": ""
+        },
+        "dae": {
+          "stackable": "none",
+          "macroRepeat": "none",
+          "specialDuration": [
+            "1Attack"
+          ],
+          "transfer": false,
+          "durationExpression": "",
+          "selfTarget": true,
+          "selfTargetAlways": false
+        },
+        "ActiveAuras": {
+          "isAura": false,
+          "aura": "None",
+          "radius": "null",
+          "alignment": "",
+          "type": "",
+          "ignoreSelf": false,
+          "height": false,
+          "hidden": false,
+          "displayTemp": false,
+          "hostile": false,
+          "onlyOnce": false
+        },
+        "dfreds-convenient-effects": {
+          "description": ""
+        }
+      },
+      "tint": null,
+      "origin": null
+    }
+  ],
+  "flags": {
+    "midi-qol": {
+      "criticalThreshold": "20",
+      "effectActivation": false,
+      "onUseMacroName": "[postActiveEffects]ItemMacro"
+    },
+    "core": {
+      "sourceId": "Item.XTRjeSJzMXwRDnRC"
+    },
+    "itemacro": {
+      "macro": {
+        "data": {
+          "_id": null,
+          "name": "Booming Blade",
+          "type": "script",
+          "author": "wLtW0cjONx7B4hSn",
+          "img": "icons/svg/dice-target.svg",
+          "scope": "global",
+          "command": "const lastArg = args[args.length - 1];\nif(args[0]==\"on\"){\n    const tactor = await MidiQOL.MQfromActorUuid(lastArg.actorUuid);\n    let weapons = tactor.items.filter(i => i.data.type === `weapon` && i.data.data.actionType == \"mwak\" && i.data.data.equipped);\n    let weapon_content = ``;\n    for (let weapon of weapons) {\n        weapon_content += `<option value=${weapon.id}>${weapon.name}</option>`;\n    }\n    let content = `\n    <div class=\"form-group\">\n    <label>Weapons : </label>\n    <select name=\"weapons\">\n        ${weapon_content}\n    </select>\n    </div>`;\n    if (weapons.length > 1){\n        new Dialog({\n            title: \"Choose Weapon\",\n            content,\n            buttons:\n            {\n                Ok:\n                {\n                    label: `Ok`,\n                    callback: (html) => {\n                        let itemId = html.find('[name=weapons]')[0].value;\n                        let weaponItem = tactor.items.get(itemId);\n                        weaponItem.roll()\n                    }\n                },\n                Cancel:\n                {\n                    label: `Cancel`\n                }\n            }\n        }).render(true);\n    }\n    else{\n        let weaponItem = weapons[0];\n        weaponItem.roll()\n    }\n}\nif(args[0].tag != \"DamageBonus\"){return};\nfor (let tokenUuid of args[0]?.hitTargetUuids) {\n    const target = await fromUuid(tokenUuid);\n    const targetActor = target.actor;\n    let effectData = {\n        \"changes\": [\n            {\n                \"key\": \"macro.itemMacro\",\n                \"mode\": 0,\n                \"value\": `${args[0].itemCardId} ${args[0].actor._id}`,\n                \"priority\": \"20\"\n            }\n        ],\n        \"disabled\": false,\n        \"duration\": {\n            \"rounds\": 1\n        },\n        \"icon\": \"icons/magic/sonic/projectile-shock-wave-blue.webp\",\n        \"label\": \"Booming Blade\",\n        \"flags\": {\n            \"dae\": {\n                \"stackable\": \"none\",\n                \"durationExpression\": \"\",\n                \"macroRepeat\": \"startEveryTurn\",\n                \"specialDuration\": [],\n                \"transfer\": false,\n                \"itemData\": {\n                    \"flags\": {\n                        \"itemacro\": {\n                            \"macro\": {\n                                \"data\": {\n                                    \"command\": 'const lastArg = args[args.length-1]\\nlet target = await canvas.tokens.get(lastArg.tokenId)\\nif(args[0] == \\\"on\\\"){\\n    let hookID = Hooks.on(\\'updateCombat\\', async function (workflow) {\\n        \\n        if(await canvas.tokens.get(workflow.current.tokenId).actor.id === args[2]){\\n            target.actor.deleteEmbeddedDocuments(\\'ActiveEffect\\',[lastArg.effectId])\\n            Hooks.off(\\\"updateCombat\\\", hookID);\\n        }\\n    })\\n    if(game.combat?.current.tokenId == lastArg.tokenId){\\n        let boomingBladeEffect = await target.actor.data.effects.get(lastArg.effectId)\\n        await boomingBladeEffect.setFlag(\\'dae\\',\\'specialDuration\\',[\\\"isMoved\\\"])\\n    }\\n\\n\\n}\\n\\nif(args[0] == \\\"each\\\"){\\n    let boomingBladeEffect = await target.actor.data.effects.get(lastArg.effectId)\\n    await boomingBladeEffect.setFlag(\\'dae\\',\\'specialDuration\\',[\\\"isMoved\\\"])\\n}\\nif(args[0] == \\\"off\\\"){    \\n    let boomingBladeCardId = args[1]\\n    let boomingBladeCasterId = args[2]\\n    let level = await game.actors.get(boomingBladeCasterId).data.data.attributes.hd\\n    let tokenD = await canvas.tokens.get(lastArg.tokenId)\\n    await new Promise(r => setTimeout(r, 200));\\nif(game.combat?.current.tokenId == lastArg.tokenId){\\n      let dices = 1 + (Math.floor((level + 1) / 6))\\n      Math.floor((4+1)/6)+1\\n      let damageRoll = await new Roll(`${dices}d8`).roll();\\n      new MidiQOL.DamageOnlyWorkflow(target.actor, target, damageRoll.total, \\\"thunder\\\", [target], damageRoll, { flavor: \\\"Booming Blade Secondary Damage\\\", itemCardId: boomingBladeCardId});  \\n  }\\n}',\n                                }\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    }\n  if(targetActor.effects.filter(i=>i.data.label == \"Booming Blade\").length < 1){\n    await MidiQOL.socket().executeAsGM(\"createEffects\", {actorUuid: targetActor.uuid, effects: [effectData]})\n  }\n}\nconst tactor = await MidiQOL.MQfromActorUuid(lastArg.actorUuid);\nconst diceMult = args[0].isCritical ? 2: 1;\nconst baseDice = Math.floor((tactor.data.data.details.level+1)/6);\nif(baseDice < 1){return}\nreturn {damageRoll: `${baseDice * diceMult}d8[thunder]`, flavor: \"Booming Blade\"};",
+          "folder": null,
+          "sort": 0,
+          "permission": {
+            "default": 0
+          },
+          "flags": {}
+        },
+        "name": "Taunting Blade",
+        "type": "script",
+        "scope": "global",
+        "command": "const lastArg = args[args.length - 1];\n\n// macro vars\nconst sequencerFile = \"jb2a.markers.fear.dark_purple.01\";\nconst sequencerScale = 1.5;\nconst damageType = \"psychic\";\n\n// sequencer caller for effects on target\nfunction sequencerEffect(target, file, scale) {\n  if (game.modules.get(\"sequencer\")?.active && hasProperty(Sequencer.Database.entries, \"jb2a\")) {\n    new Sequence().effect().file(file).atLocation(target).scaleToObject(scale).play();\n  }\n}\n\nfunction weaponAttack(caster, sourceItemData, origin, target) {\n  const chosenWeapon = DAE.getFlag(caster, \"tauntingBladeChoice\");\n  const filteredWeapons = caster.items.filter((i) => i.type === \"weapon\" && i.system.equipped);\n  const weaponContent = filteredWeapons\n    .map((w) => {\n      const selected = chosenWeapon && chosenWeapon == w.id ? \" selected\" : \"\";\n      return `<option value=\"${w.id}\"${selected}>${w.name}</option>`;\n    })\n    .join(\"\");\n\n  const content = `\n<div class=\"form-group\">\n <label>Weapons : </label>\n <select name=\"weapons\"}>\n ${weaponContent}\n </select>\n</div>\n`;\n  new Dialog({\n    title: \"Taunting Blade: Choose a weapon to attack with\",\n    content,\n    buttons: {\n      Ok: {\n        label: \"Ok\",\n        callback: async (html) => {\n          const characterLevel = caster.type === \"character\" ? caster.system.details.level : caster.system.details.cr;\n          const cantripDice = 1 + Math.floor((characterLevel + 1) / 6);\n          const itemId = html.find(\"[name=weapons]\")[0].value;\n          const weaponItem = caster.getEmbeddedDocument(\"Item\", itemId);\n          DAE.setFlag(caster, \"tauntingBladeChoice\", itemId);\n          const weaponCopy = duplicate(weaponItem);\n          delete weaponCopy._id;\n          if (cantripDice > 0) {\n            weaponCopy.system.damage.parts[0][0] += ` + ${cantripDice - 1}d6[${damageType}]`;\n          }\n          weaponCopy.name = weaponItem.name + \" [Taunting Blade]\";\n          weaponCopy.effects.push({\n            changes: [{ key: \"macro.itemMacro\", mode: 0, value: \"\", priority: \"20\", }],\n            disabled: false,\n            duration: { rounds: 1 },\n            icon: sourceItemData.img,\n            label: sourceItemData.name,\n            origin,\n            transfer: false,\n            flags: { targetUuid: target.uuid, casterUuid: caster.uuid, origin, cantripDice, damageType, dae: { transfer: false } },\n          });\n          setProperty(weaponCopy, \"flags.itemacro\", duplicate(sourceItemData.flags.itemacro));\n          setProperty(weaponCopy, \"flags.midi-qol.effectActivation\", false);\n          const attackItem = new CONFIG.Item.documentClass(weaponCopy, { parent: caster });\n          const options = { showFullCard: false, createWorkflow: true, configureDialog: true };\n          await MidiQOL.completeItemRoll(attackItem, options);\n        },\n      },\n      Cancel: {\n        label: \"Cancel\",\n      },\n    },\n  }).render(true);\n}\n\nif (args[0].tag === \"OnUse\") {\n  if (lastArg.targets.length > 0) {\n    const casterData = await fromUuid(lastArg.actorUuid);\n    const caster = casterData.actor ? casterData.actor : casterData;\n    weaponAttack(caster, lastArg.itemData, lastArg.uuid, lastArg.targets[0]);\n  } else {\n    ui.notifications.error(\"Taunting Blade: No target selected: please select a target and try again.\");\n  }\n\n} else if (args[0] === \"on\") {\n  const targetToken = canvas.tokens.get(lastArg.tokenId);\n  sequencerEffect(targetToken, sequencerFile, sequencerScale);\n  if (lastArg.efData.flags.cantripDice) {\n    hook = Hooks.on(\"midi-qol.AttackRollComplete\", async (workflow) => {\n      if(workflow.tokenUuid == lastArg.tokenUuid){\n        if(workflow.hitTargets.size < workflow.targets.size){\n          const targetToken = await fromUuid(lastArg.tokenUuid);\n          const sourceItem = await fromUuid(lastArg.efData.flags.origin);\n          const caster = sourceItem.parent;\n          const casterToken = canvas.tokens.placeables.find((t) => t.actor?.uuid === caster.uuid);\n          const damageRoll = await new Roll(`${lastArg.efData.flags.cantripDice}d6[${damageType}]`).evaluate({ async: true });\n          if (game.dice3d) game.dice3d.showForRoll(damageRoll);\n          const workflowItemData = duplicate(sourceItem.data);\n          workflowItemData.system.target = { value: 1, units: \"\", type: \"creature\" };\n          workflowItemData.name = \"Taunting Blade: Failed Attack Roll Damage\";\n      \n          await new MidiQOL.DamageOnlyWorkflow(\n            caster,\n            casterToken,\n            damageRoll.total,\n            damageType,\n            [targetToken.object], // bug in midi/levels auto cover can't cope with token\n            damageRoll,\n            {\n              flavor: `(${CONFIG.DND5E.damageTypes[damageType]})`,\n              itemCardId: \"new\",\n              itemData: workflowItemData,\n              isCritical: false,\n            }\n          );\n          sequencerEffect(targetToken, sequencerFile, sequencerScale);\n          return MidiQOL.socket().executeAsGM('removeEffects', {'actorUuid': lastArg.actorUuid, 'effects': [lastArg.effectId]});\n        }\n      }\n      \n    });\n    DAE.setFlag(await fromUuid(lastArg.actorUuid), \"tauntingBladeHook\", hook);\n  }\n} else if (args[0] === \"off\") {\n  actor = await fromUuid(lastArg.actorUuid)\n  hook = DAE.getFlag(actor, \"tauntingBladeHook\");\n  Hooks.off(\"midi-qol.AttackRollComplete\", hook);\n  DAE.unsetFlag(actor, \"tauntingBladeHook\");\n}",
+        "author": "cDAGQaRhU106XUNd",
+        "_id": null,
+        "img": "icons/svg/dice-target.svg",
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        },
+        "flags": {},
+        "_stats": {
+          "systemId": null,
+          "systemVersion": null,
+          "coreVersion": null,
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        }
+      }
+    },
+    "midiProperties": {
+      "nodam": false,
+      "fulldam": false,
+      "halfdam": false,
+      "rollOther": false,
+      "critOther": false,
+      "magicdam": false,
+      "magiceffect": false,
+      "concentration": false,
+      "toggleEffect": false,
+      "autoFailFriendly": false,
+      "autoSaveFriendly": false,
+      "offHandWeapon": false,
+      "ignoreTotalCover": false
+    },
+    "exportSource": {
+      "world": "ostenwold",
+      "system": "dnd5e",
+      "coreVersion": "10.291",
+      "systemVersion": "2.1.5"
+    },
+    "scene-packer": {
+      "sourceId": "Item.ryTf01QTzHm0cCp3"
+    }
+  },
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "2.1.5",
+    "coreVersion": "10.291",
+    "createdTime": null,
+    "modifiedTime": 1679141006743,
+    "lastModifiedBy": "cDAGQaRhU106XUNd"
+  }
+}
